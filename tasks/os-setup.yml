@@ -34,7 +34,7 @@
   command: /bin/bash -c "docker run -v /mnt:/mnt --rm {{ build_os_distribution }}{{ build_os_version }}_builder bash -c \"yum --releasever {{ build_os_version }} --installroot=/mnt/ -y groupinstall Base\""
   sudo: True
 
-- name: Install Yum Repos (CentOS)
+- name: Install Yum Repos
   command: /bin/bash -c "docker run -v /mnt:/mnt --rm {{ build_os_distribution }}{{ build_os_version }}_builder bash -c \"yum --releasever {{ build_os_version }} --installroot=/mnt/ -y install centos-release deltarpm\""
   sudo: True
 

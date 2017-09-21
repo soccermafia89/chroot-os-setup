@@ -22,6 +22,7 @@ Dependencies
 Example Playbook
 ----------------
 
+```
 - name: Mount Chroot
   hosts: localhost
   roles:
@@ -31,6 +32,7 @@ Example Playbook
     root_device_name: "sdd"
     build_os_distribution: "centos"
     build_os_version: "7"
+```
 
 License
 -------
