@@ -13,6 +13,8 @@ Role Variables
 
 - boot_device_name -- Boot device name, available on /dev/.
 - root_device_name: -- Root device name, available on /dev/.
+- build_os_distribution: -- OS distribution to install on mounted filesystem.
+- build_os_version: -- OS version to install on mounted filesystem.
 
 Dependencies
 ------------
@@ -27,6 +29,8 @@ Example Playbook
   vars:
     boot_device_name: "sdc"
     root_device_name: "sdd"
+    build_os_distribution: "centos"
+    build_os_version: "7"
 
 License
 -------
