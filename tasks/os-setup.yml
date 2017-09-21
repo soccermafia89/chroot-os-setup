@@ -2,17 +2,17 @@
 
 - name: Locate Boot UUID
   command: /bin/bash -c "blkid -s UUID /dev/{{ boot_device_name }}1 | cut -d'\"' -f2"
-  sudo: True
+  become: True
   register: boot_fs_uuid_out
 
 - name: Locate Swap UUID
   command: /bin/bash -c "blkid -s UUID /dev/{{ boot_device_name }}2 | cut -d'\"' -f2"
-  sudo: True
+  become: True
   register: swap_fs_uuid_out
 
 - name: Locate Root UUID
   command: /bin/bash -c "blkid -s UUID /dev/{{ root_device_name }} | cut -d'\"' -f2"
-  sudo: True
+  become: True
   register: root_fs_uuid_out
 
 - name: Set UUIDs
@@ -25,19 +25,19 @@
   template: 
     src: "fstab.j2"
     dest: "/mnt/etc/fstab"
-  sudo: True
+  become: True
 
 - name: Copy Yum Conf
   copy: src=tmp.yum.conf dest=/tmp/tmp.yum.conf
 
 - name: Install Release Server
   command: /bin/bash -c "docker run -v /mnt:/mnt --rm {{ build_os_distribution }}{{ build_os_version }}_builder bash -c \"yum --releasever {{ build_os_version }} --installroot=/mnt/ -y groupinstall Base\""
-  sudo: True
+  become: True
 
 - name: Install Yum Repos
   command: /bin/bash -c "docker run -v /mnt:/mnt --rm {{ build_os_distribution }}{{ build_os_version }}_builder bash -c \"yum --releasever {{ build_os_version }} --installroot=/mnt/ -y install centos-release deltarpm\""
-  sudo: True
+  become: True
 
 - name: Copy resolv.conf
   command: /bin/bash -c "cp /etc/resolv.conf /mnt/etc/resolv.conf"
-  sudo: True
+  become: True
