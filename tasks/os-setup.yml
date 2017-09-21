@@ -30,7 +30,7 @@
 - name: Copy Yum Conf
   copy: src=tmp.yum.conf dest=/tmp/tmp.yum.conf
 
-- name: Install Release Server
+- name: Install Release Ver
   command: /bin/bash -c "docker run -v /mnt:/mnt --rm {{ build_os_distribution }}{{ build_os_version }}_builder bash -c \"yum --releasever {{ build_os_version }} --installroot=/mnt/ -y groupinstall Base\""
   become: True
 
