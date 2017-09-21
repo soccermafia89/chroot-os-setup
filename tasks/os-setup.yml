@@ -30,60 +30,13 @@
 - name: Copy Yum Conf
   copy: src=tmp.yum.conf dest=/tmp/tmp.yum.conf
 
-- name: Set Releasever Variable (CentOS)
-  set_fact:
-    releasever: "{{ build_os_version }}"
-  when: build_os_distribution == "centos"
-
-- name: Set Releasever Variable (RedHat)
-  set_fact:
-    releasever: "{{ build_os_version }}Server"
-  when: build_os_distribution == "rhel"
-
-- name: Install Release Server (CentOS)
-  command: /bin/bash -c "docker run -v /mnt:/mnt --rm {{ build_os_distribution }}{{ build_os_version }}_builder bash -c \"yum --releasever {{ releasever }} --installroot=/mnt/ -y groupinstall Base\""
+- name: Install Release Server
+  command: /bin/bash -c "docker run -v /mnt:/mnt --rm {{ build_os_distribution }}{{ build_os_version }}_builder bash -c \"yum --releasever {{ build_os_version }} --installroot=/mnt/ -y groupinstall Base\""
   sudo: True
-  when: build_os_distribution == "centos"
-
-# Due to rhel requiring a subscsription the install command must be run from a rhel based host.
-- name: Set File Status Fact Default
-  set_fact:
-    rpm_name_exists: "False"
-
-- name: Check chroot environment for rpm
-  stat: path=/mnt/var/lib/rpm/Name
-  register: file_status
-  when: build_os_distribution == "rhel"
-
-- name: Set File Status Fact
-  set_fact:
-    rpm_name_exists: "{{ file_status.stat.exists }}"
-  when: build_os_distribution == "rhel"
-
-- name: Rebuild rpmdb outside chroot
-  command: /bin/bash -c "docker run -v /mnt:/mnt --rm {{ build_os_distribution }}{{ build_os_version }}_builder bash -c \"rpm --root /mnt --rebuilddb\""
-  sudo: True
-  when: "('{{ build_os_distribution }}' == 'rhel') and ({{ rpm_name_exists }})"
-
-- name: Symlink Yum Repos
-  file: path=/mnt/tmp/yum.repos.d state=link src=/etc/yum.repos.d
-  when: build_os_distribution == "rhel"
-
-- name: Install Release Server (RedHat)
-  command: /bin/bash -c "yum -c /tmp/tmp.yum.conf  --releasever={{ releasever }} --installroot=/mnt/ -y groupinstall Base"
-  sudo: True
-  when: build_os_distribution == "rhel"
 
 - name: Install Yum Repos (CentOS)
-  command: /bin/bash -c "docker run -v /mnt:/mnt --rm {{ build_os_distribution }}{{ build_os_version }}_builder bash -c \"yum --releasever {{ releasever }} --installroot=/mnt/ -y install centos-release deltarpm\""
+  command: /bin/bash -c "docker run -v /mnt:/mnt --rm {{ build_os_distribution }}{{ build_os_version }}_builder bash -c \"yum --releasever {{ build_os_version }} --installroot=/mnt/ -y install centos-release deltarpm\""
   sudo: True
-  when: build_os_distribution == "centos"
-
-# Rhel needs cloud-init and other packages to enable authenticated access to their yum repos.
-- name: Install Yum Repos (RedHat)
-  command: /bin/bash -c "yum -c /tmp/tmp.yum.conf  --releasever={{ releasever }} --installroot=/mnt/ -y install redhat-release rh-amazon-rhui-client subscription-manager cloud-init NetworkManager deltarpm"
-  sudo: True
-  when: build_os_distribution == "rhel"
 
 - name: Copy resolv.conf
   command: /bin/bash -c "cp /etc/resolv.conf /mnt/etc/resolv.conf"
